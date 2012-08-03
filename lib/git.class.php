@@ -442,15 +442,16 @@ class Git
 
         foreach ($packed as $ref) 
         {
-            if ('#' === $ref{0}) continue;
+            // If the ref line was empty or if it is a comment, bail
+            if (empty($ref) || '#' === $ref{0}) continue;
 
             $parts = explode(' ', $ref);
             $count = count($parts);
 
+            // If we don't have exactly a hash and a path, bail
             if ($count !== 2) continue;
 
             list($hash, $path) = $parts;
-
             $refs[$hash] = $path;
         }
 
