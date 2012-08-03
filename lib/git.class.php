@@ -63,28 +63,28 @@ class Git
 
     static public function getTypeID($name)
     {
-	if ($name == 'commit')
-	    return Git::OBJ_COMMIT;
-	else if ($name == 'tree')
-	    return Git::OBJ_TREE;
-	else if ($name == 'blob')
-	    return Git::OBJ_BLOB;
-	else if ($name == 'tag')
-	    return Git::OBJ_TAG;
-	throw new Exception(sprintf('unknown type name: %s', $name));
+        if ($name == 'commit')
+            return Git::OBJ_COMMIT;
+        else if ($name == 'tree')
+            return Git::OBJ_TREE;
+        else if ($name == 'blob')
+            return Git::OBJ_BLOB;
+        else if ($name == 'tag')
+            return Git::OBJ_TAG;
+        throw new Exception(sprintf('unknown type name: %s', $name));
     }
 
     static public function getTypeName($type)
     {
-	if ($type == Git::OBJ_COMMIT)
-	    return 'commit';
-	else if ($type == Git::OBJ_TREE)
-	    return 'tree';
-	else if ($type == Git::OBJ_BLOB)
-	    return 'blob';
-	else if ($type == Git::OBJ_TAG)
-	    return 'tag';
-	throw new Exception(sprintf('no string representation of type %d', $type));
+        if ($type == Git::OBJ_COMMIT)
+            return 'commit';
+        else if ($type == Git::OBJ_TREE)
+            return 'tree';
+        else if ($type == Git::OBJ_BLOB)
+            return 'blob';
+        else if ($type == Git::OBJ_TAG)
+            return 'tag';
+        throw new Exception(sprintf('no string representation of type %d', $type));
     }
 
     public function __construct($dir)
@@ -93,8 +93,8 @@ class Git
         if ($this->dir === FALSE || !@is_dir($this->dir))
             throw new Exception(sprintf('not a directory: %s', $dir));
 
-	$this->packs = array();
-	$dh = opendir(sprintf('%s/objects/pack', $this->dir));
+        $this->packs = array();
+        $dh = opendir(sprintf('%s/objects/pack', $this->dir));
         if ($dh !== FALSE) {
             while (($entry = readdir($dh)) !== FALSE)
                 if (preg_match('#^pack-([0-9a-fA-F]{40})\.idx$#', $entry, $m))
@@ -307,11 +307,11 @@ class Git
             $pos = 0;
             $offset = -1;
             do
-            {
-                $offset++;
-                $c = ord($buf{$pos++});
-                $offset = ($offset << 7) + ($c & 0x7F);
-            }
+        {
+            $offset++;
+            $c = ord($buf{$pos++});
+            $offset = ($offset << 7) + ($c & 0x7F);
+        }
             while ($c & 0x80);
 
             $delta = gzuncompress(substr($buf, $pos), $size);
@@ -355,18 +355,18 @@ class Git
 
         if (isset($cache[$object_name]))
             return $cache[$object_name];
-	$sha1 = sha1_hex($object_name);
-	$path = sprintf('%s/objects/%s/%s', $this->dir, substr($sha1, 0, 2), substr($sha1, 2));
-	if (file_exists($path))
-	{
+        $sha1 = sha1_hex($object_name);
+        $path = sprintf('%s/objects/%s/%s', $this->dir, substr($sha1, 0, 2), substr($sha1, 2));
+        if (file_exists($path))
+        {
             list($hdr, $object_data) = explode("\0", gzuncompress(file_get_contents($path)), 2);
 
-	    sscanf($hdr, "%s %d", $type, $object_size);
-	    $object_type = Git::getTypeID($type);
+            sscanf($hdr, "%s %d", $type, $object_size);
+            $object_type = Git::getTypeID($type);
             $r = array($object_type, $object_data);
-	}
-	else if ($x = $this->findPackedObject($object_name))
-	{
+        }
+        else if ($x = $this->findPackedObject($object_name))
+        {
             list($pack_name, $object_offset) = $x;
 
             $pack = fopen(sprintf('%s/objects/pack/pack-%s.pack', $this->dir, sha1_hex($pack_name)), 'rb');
@@ -380,7 +380,7 @@ class Git
 
             $r = $this->unpackObject($pack, $object_offset);
             fclose($pack);
-	}
+        }
         else
             throw new Exception(sprintf('object not found: %s', sha1_hex($object_name)));
         $cache[$object_name] = $r;
@@ -395,11 +395,11 @@ class Git
      */
     public function getObject($name)
     {
-	list($type, $data) = $this->getRawObject($name);
-	$object = GitObject::create($this, $type);
-	$object->unserialize($data);
-	assert($name == $object->getName());
-	return $object;
+        list($type, $data) = $this->getRawObject($name);
+        $object = GitObject::create($this, $type);
+        $object->unserialize($data);
+        assert($name == $object->getName());
+        return $object;
     }
 
     /**
@@ -410,29 +410,29 @@ class Git
      */
     public function getTip($branch='master')
     {
-	$subpath = sprintf('refs/heads/%s', $branch);
-	$path = sprintf('%s/%s', $this->dir, $subpath);
-	if (file_exists($path))
-	    return sha1_bin(file_get_contents($path));
-	$path = sprintf('%s/packed-refs', $this->dir);
-	if (file_exists($path))
-	{
-	    $head = NULL;
-	    $f = fopen($path, 'rb');
-	    flock($f, LOCK_SH);
-	    while ($head === NULL && ($line = fgets($f)) !== FALSE)
-	    {
-		if ($line{0} == '#')
-		    continue;
-		$parts = explode(' ', trim($line));
-		if (count($parts) == 2 && $parts[1] == $subpath)
-		    $head = sha1_bin($parts[0]);
-	    }
-	    fclose($f);
-	    if ($head !== NULL)
-		return $head;
-	}
-	throw new Exception(sprintf('no such branch: %s', $branch));
+        $subpath = sprintf('refs/heads/%s', $branch);
+        $path = sprintf('%s/%s', $this->dir, $subpath);
+        if (file_exists($path))
+            return sha1_bin(file_get_contents($path));
+        $path = sprintf('%s/packed-refs', $this->dir);
+        if (file_exists($path))
+        {
+            $head = NULL;
+            $f = fopen($path, 'rb');
+            flock($f, LOCK_SH);
+            while ($head === NULL && ($line = fgets($f)) !== FALSE)
+            {
+                if ($line{0} == '#')
+                    continue;
+                $parts = explode(' ', trim($line));
+                if (count($parts) == 2 && $parts[1] == $subpath)
+                    $head = sha1_bin($parts[0]);
+            }
+            fclose($f);
+            if ($head !== NULL)
+                return $head;
+        }
+        throw new Exception(sprintf('no such branch: %s', $branch));
     }
 }
 
