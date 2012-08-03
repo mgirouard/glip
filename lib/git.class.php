@@ -434,5 +434,27 @@ class Git
         }
         throw new Exception(sprintf('no such branch: %s', $branch));
     }
+
+    public function getRefs()
+    {
+        $refs = array();
+        $packed = explode("\n", file_get_contents("$this->dir/packed-refs"));
+
+        foreach ($packed as $ref) 
+        {
+            if ('#' === $ref{0}) continue;
+
+            $parts = explode(' ', $ref);
+            $count = count($parts);
+
+            if ($count !== 2) continue;
+
+            list($hash, $path) = $parts;
+
+            $refs[$hash] = $path;
+        }
+
+        return $refs;
+    }
 }
 
