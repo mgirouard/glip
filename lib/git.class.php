@@ -435,6 +435,11 @@ class Git
         throw new Exception(sprintf('no such branch: %s', $branch));
     }
 
+    /**
+     * @brief Fetch a list of all branches and tags
+     *
+     * @return (array) A hashtable of refs, keyed to the ref name
+     */
     public function getRefs()
     {
         $refs = array();
