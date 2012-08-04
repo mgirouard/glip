@@ -1,1 +1,3 @@
 doc/html
+*.sw*
+.DS_Store
