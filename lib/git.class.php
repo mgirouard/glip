@@ -452,7 +452,7 @@ class Git
             if ($count !== 2) continue;
 
             list($hash, $path) = $parts;
-            $refs[$hash] = $path;
+            $refs[$path] = sha1_bin($hash);
         }
 
         return $refs;
